@@ -43,7 +43,8 @@
             L.control.fullscreen().addTo(map);
 
             // add hq coords
-            var hqLatLng = new L.LatLng(37.3845, -122.0881);
+            //var hqLatLng = new L.LatLng(37.3845, -122.0881);
+            var hqLatLng = new L.LatLng(33.936051, -81.048565);
 
             // add circle
             L.circle(hqLatLng, 110000, {
@@ -141,7 +142,30 @@
                 }
             }
 
-            function handleTraffic(msg, srcPoint, hqPoint, srcLatLng) {
+            function handleParticle(msg, srcPoint) {
+                var i = 0;
+                var x = srcPoint['x'];
+                var y = srcPoint['y'];
+                
+                svg.append('circle')
+                    .attr('cx', x)
+                    .attr('cy', y)
+                    .attr('r', 1e-6)
+                    .style('fill', 'none')
+                    //.style('stroke', d3.hsl((i = (i + 1) % 360), 1, .5))
+                    .style('stroke', msg.color)
+                    .style('stroke-opacity', 1)
+                        .transition()
+                        .duration(2000)
+                        .ease(Math.sqrt)
+                        .attr('r', 35)
+                        .style('stroke-opacity', 1e-6)
+                        .remove();
+
+                //d3.event.preventDefault();
+            }
+
+            function handleTraffic(msg, srcPoint, hqPoint) {
                 var fromX = srcPoint['x'];
                 var fromY = srcPoint['y'];
                 var toX = hqPoint['x'];
@@ -316,6 +340,7 @@
                             console.log('');
 
                             addCircle(msg, srcLatLng);
+                            handleParticle(msg, srcPoint);
                             handleTraffic(msg, srcPoint, hqPoint, srcLatLng);
                             handleLegend(msg);
 
