@@ -1,4 +1,4 @@
-### First and Foremost:
+### First and Foremost
 I undertook this project to learn JavaScript, and to improve upon the Python I already knew. I'm sure there are several things I could have done differently in my implementation, and I won't be offended if I receive constructive criticism from someone who downloads and views my code. I know I learned a ton when working on this, and I hope the open source community will continue to teach me things :)
 
 ### Cyber Security GeoIP Attack Map Visualization
