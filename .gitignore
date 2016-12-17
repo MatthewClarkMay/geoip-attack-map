@@ -1,7 +1,12 @@
 .idea/
+
 env/
+
+dump.rdb
 DataServer/dump.rdb
+AttackMapServer/dump.rdb
+
 DataServerDB/GeoLite2-City.mmdb
 DataServer/__pycache__/
+
 AttackMapServer/static/flags/*
-AttackMapServer/dump.rdb
