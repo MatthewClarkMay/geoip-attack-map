@@ -104,20 +104,24 @@ Tested on Ubuntu 16.04 LTS.
     * [http://localhost:8888/](http://localhost:8888/) or [http://127.0.0.1:8888/](http://127.0.0.1:8888/)
   
     * To access by a browser in another computer, use the external IP of the machine running the AttackMapServer.
-      * Edite the IP Address in the file "index.html" at "AttackMapServer" directory. From:
-    ```javascript
-    var webSock = new WebSocket("ws:/127.0.0.1:8888/websocket");
-    ```        
+    
+     * Edite the IP Address in the file "index.html" at "AttackMapServer" directory. From:
+      
+       ```javascript
+       var webSock = new WebSocket("ws:/127.0.0.1:8888/websocket");
+       ```        
      * To, for example: 
-     ```javascript
-     var webSock = new WebSocket("ws:/192.168.11.106:8888/websocket");
-     ```
+     
+       ```javascript
+       var webSock = new WebSocket("ws:/192.168.11.106:8888/websocket");
+       ```
      * Restart the Attack Map Server:
      
        ```sh
        sudo python3 AttackMapServer.py
        ```       
      * On the other computer, points the browser to:
-     ```sh
-     http://192.168.11.106:8888/
-     ```    
+     
+       ```sh
+       http://192.168.11.106:8888/
+       ```    
