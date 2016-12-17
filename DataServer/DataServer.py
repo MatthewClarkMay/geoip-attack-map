@@ -10,6 +10,7 @@ import json
 import maxminddb
 #import re
 import redis
+import io
 
 from const import META, PORTMAP
 
@@ -29,7 +30,7 @@ redis_instance = None
 
 # required input paths
 syslog_path = '/var/log/syslog'
-db_path = '/db-data/GeoLite2-City.mmdb'
+db_path = '../DataServerDB/GeoLite2-City.mmdb'
 
 # file to log data
 log_file_out = '/var/log/map_data_server.out'
@@ -278,7 +279,7 @@ def main():
     hq_dict = find_hq_lat_long(hq_ip)
 
     # follow/parse/format/publish syslog data
-    with open(syslog_path, "r") as syslog_file:
+    with io.open(syslog_path, "r", encoding='ISO-8859-1') as syslog_file:
         while True:
             where = syslog_file.tell()
             line = syslog_file.readline()
