@@ -220,14 +220,22 @@ def main():
         print('SHUTTING DOWN')
         exit()
 
+    # Define the static path
+    static_path = path.join( path.dirname(__file__), 'static' )
+
     # Register handler pages
     handlers = [
                 (r'/websocket', WebSocketChatHandler),
+                (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': 'static'}),
+                (r'/flags/(.*)', tornado.web.StaticFileHandler, {'path': 'static/flags'}),
                 (r'/', IndexHandler)
-                ] # Define static settings
+                ]
+
+    # Define static settings
     settings = {
-                'static_path': path.join(path.dirname(__file__), 'static')
+                #'static_path': static_path
                 }
+
     # Create and start app listening on port 8888
     app = tornado.web.Application(handlers, **settings)
     app.listen(8888)
