@@ -3,5 +3,5 @@ env/
 DataServer/dump.rdb
 DataServerDB/GeoLite2-City.mmdb
 DataServer/__pycache__/
-AttackMap/static/flags/*
-AttackMap/dump.rdb
+AttackMapServer/static/flags/*
+AttackMapServer/dump.rdb
