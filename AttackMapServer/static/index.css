@@ -23,6 +23,43 @@
         border-radius:50%;
         margin:0px;
     }
+
+    #informIP {
+        display:none;
+        height:auto;
+        width:250px;
+        position:absolute;
+        bottom:30%;
+        left:10%;
+        padding:15px;
+        border-radius:25px;
+        background:#666161;
+        opacity:0.9;
+    }
+
+    #informIP #fechar{
+        float:right;
+        left:90%;
+        border-radius:25px;
+        color:red;
+        font-style:oblique;
+       
+       
+    }
+
+    #informIP #blockIP{
+        position:relative;
+        left:30%;
+        padding:10px;
+        font-weight:bold;
+        box-shadow:1px 1px;
+    }
+    #informIP h3{
+        font-size:1.4em;
+        padding:0px;
+	color:#ffffff;        
+    }
+
     .container-fluid {
         height:25%;
         width:100%;
@@ -59,6 +96,18 @@
     }
     .col-md-7 {
         height:100%;
+        overflow-y:scroll;
+        overflow-x:auto;
+    }
+	
+    .col-md-8 {
+        height:158px;
+        overflow-y:scroll;
+        overflow-x:auto;
+    }
+
+    .col-md-4 {
+        height:154px;
         overflow-y:scroll;
         overflow-x:auto;
     }

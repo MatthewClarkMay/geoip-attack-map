@@ -12,6 +12,8 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
+import re
+
 
 from os import getuid, path
 from sys import exit
@@ -59,7 +61,7 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
 
         try:
             # This is the IP address of the DataServer
-            self.client = tornadoredis.Client('127.0.0.1')
+            self.client = tornadoredis.Client('172.20.20.97')
             self.client.connect()
             print('[*] Connected to Redis server')
             yield tornado.gen.Task(self.client.subscribe, 'attack-map-production')
@@ -71,20 +73,44 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         print('[*] Closing connection.')
 
+  
+
+
     # This function is called everytime a Redis message is received
     def on_message(self, msg):
 
+
         if len(msg) == 0:
+            print ("msg == 0\n")
             return None
+
+        if 'ip_blocked' in msg:
+          ip = re.split(":",msg)
+          fp = open('/mnt/map_attack_blk/LOG4.log','a')
+          fp.write(ip[1]+"\n")
+          fp.close()
+
+          
+        
+
         try:
             json_data = json.loads(msg.body)
         except Exception as ex:
             return None
 
+
         if 'msg_type' in json_data:
             msg_type = json_data['msg_type']
         else:
             msg_type = None
+        if 'msg_type2' in json_data:
+            msg_type2 = json_data['msg_type2']
+        else:
+            msg_type2 = None
+        if 'msg_type3' in json_data:
+            msg_type3 = json_data['msg_type3']
+        else:
+            msg_type3 = None
         if 'protocol' in json_data:
             protocol = json_data['protocol']
         else:
@@ -182,8 +208,11 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
         else:
             ip_to_code = None
 
+
         msg_to_send = {
                         'type': msg_type,
+                        'type2': msg_type2, 
+                        'type3': msg_type3,
                         'protocol': protocol,
                         'src_ip': src_ip,
                         'dst_ip': dst_ip,
@@ -203,7 +232,8 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
                         'event_count': event_count,
                         'continents_tracked': continents_tracked,
                         'countries_tracked': countries_tracked,
-                        'ips_tracked': ips_tracked,
+                        #'ips_tracked': "<a href='" + str(ips_tracked) + "'>" + str(ips_tracked) + "</a>",
+			'ips_tracked': ips_tracked,
                         'unknowns': unknowns,
                         'event_time': event_time,
                         'country_to_code': country_to_code,
