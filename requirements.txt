@@ -1,0 +1,4 @@
+maxminddb==1.2.2
+redis==2.10.5
+tornado==4.4.2
+tornado-redis==2.4.18

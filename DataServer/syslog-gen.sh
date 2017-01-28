@@ -12,7 +12,7 @@ do
         #port=${possible_ports[$RANDOM % ${#possible_ports[@]}]}
         src_port=$port
         dst_port=$port
-        logger -t attack-map-sample "$src_ip,$dst_ip,$src_port,$dst_port"
+        logger -t attack-map-sample "$src_ip,$dst_ip,$src_port,$dst_port,ATTACK!!!$port,JOOMLA$port"
         sleep .2 
     done
 done
