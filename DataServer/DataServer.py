@@ -29,13 +29,8 @@ redis_ip = '127.0.0.1'
 redis_instance = None
 
 # required input paths
-<<<<<<< HEAD
 syslog_path = '/var/log/syslog'
 #syslog_path = '/var/log/reverse-proxy.log'
-=======
-#syslog_path = '/var/log/syslog'
-syslog_path = '/var/log/proxy-reverso.log'
->>>>>>> 1336fcc01308858d750530e18e79ad4d64ba8e49
 db_path = '../DataServerDB/GeoLite2-City.mmdb'
 
 # file to log data
@@ -110,12 +105,7 @@ def connect_redis(redis_ip):
 
 def get_msg_type():
     # @TODO
-<<<<<<< HEAD
     # Add support for more message types later
-=======
-    # add support for more message types later
-    
->>>>>>> 1336fcc01308858d750530e18e79ad4d64ba8e49
     return "Traffic"
 
 # Check to see if packet is using an interesting TCP/UDP protocol based on source or destination port
@@ -170,13 +160,9 @@ def parse_syslog(line):
     line = line.split()
     data = line[-1]
     data = data.split(',')
-<<<<<<< HEAD
 
     if len(data) != 6:
     #if len(data) != 4:
-=======
-    if len(data) != 6:
->>>>>>> 1336fcc01308858d750530e18e79ad4d64ba8e49
         print('NOT A VALID LOG')
         return False
     else:
@@ -184,26 +170,16 @@ def parse_syslog(line):
         dst_ip = data[1]
         src_port = data[2]
         dst_port = data[3]
-<<<<<<< HEAD
         #test
         type_attack = data[4]
-=======
-        type_attack = data[4]
-        #teste
->>>>>>> 1336fcc01308858d750530e18e79ad4d64ba8e49
         cve_attack = data[5]
         data_dict = {
                     'src_ip': src_ip,
                     'dst_ip': dst_ip,
                     'src_port': src_port,
                     'dst_port': dst_port,
-<<<<<<< HEAD
                     #test
                     'type_attack': type_attack,
-=======
-                    'type_attack': type_attack,
-                    #teste
->>>>>>> 1336fcc01308858d750530e18e79ad4d64ba8e49
                     'cve_attack': cve_attack
                     }
         return data_dict
@@ -331,13 +307,8 @@ def main():
                         
                         msg_type = {'msg_type': get_msg_type()}
                         msg_type2 = {'msg_type2': syslog_data_dict['type_attack']}
-<<<<<<< HEAD
                         msg_type3 = {'msg_type3': syslog_data_dict['cve_attack']}
 
-=======
-                        #teste
-                        msg_type3 = {'msg_type3': syslog_data_dict['cve_attack']}
->>>>>>> 1336fcc01308858d750530e18e79ad4d64ba8e49
                         proto = {'protocol': get_tcp_udp_proto(
                                                             syslog_data_dict['src_port'],
                                                             syslog_data_dict['dst_port']

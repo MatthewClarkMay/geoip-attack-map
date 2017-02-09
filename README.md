@@ -30,7 +30,7 @@ Tested on Ubuntu 16.04 LTS.
 
   ```sh
   sudo apt install python3-pip redis-server
-  sudo apt-get install python3-pip redis-server
+
   ```
 * Clone the application:
 
@@ -43,6 +43,7 @@ Tested on Ubuntu 16.04 LTS.
   ```sh
   cd geoip-attack-map
   sudo pip3 install -U -r requirements.txt
+
   ```
   
 * Start Redis Server:
@@ -53,16 +54,18 @@ Tested on Ubuntu 16.04 LTS.
   ```
 * Configure the Data Server DB:
   
-  ```sh
+    ```sh
   cd DataServerDB
   ./db-dl.sh
   cd ..
+
   ```
 * Start the Data Server:
 
-  ```sh
+    ```sh
   cd DataServer
   sudo python3 DataServer.py
+
   ```
   
 * Start the Syslog Gen Script, inside DataServer directory:
@@ -70,7 +73,7 @@ Tested on Ubuntu 16.04 LTS.
   * Open a new terminal tab (Ctrl+Shift+T, on Ubuntu).
   
     ```sh
-    python3 syslog-gen.py
+    ./syslog-gen.py
     ./syslog-gen.sh
     ```
 
@@ -105,11 +108,6 @@ Tested on Ubuntu 16.04 LTS.
      
        ```javascript
        var webSock = new WebSocket("ws:/192.168.1.100:8888/websocket");
-       ```        
-     * To, for example: 
-     
-       ```javascript
-       var webSock = new WebSocket("ws:/192.168.11.106:8888/websocket");
        ```
      * Restart the Attack Map Server:
      
@@ -120,9 +118,4 @@ Tested on Ubuntu 16.04 LTS.
      
        ```sh
        http://192.168.1.100:8888/
-       ```       
-     * On the other computer, points the browser to:
-     
-       ```sh
-       http://192.168.11.106:8888/
        ```

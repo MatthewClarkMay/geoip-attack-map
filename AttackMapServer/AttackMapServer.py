@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#/usr/bin/python3
 
 """
 AUTHOR: Matthew May - mcmay.web@gmail.com
@@ -8,12 +8,11 @@ AUTHOR: Matthew May - mcmay.web@gmail.com
 import json
 import redis
 import tornadoredis
-import tornado.httpserver
+#import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
-import re
-
+#import re
 
 from os import getuid, path
 from sys import exit
@@ -61,7 +60,7 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
 
         try:
             # This is the IP address of the DataServer
-            self.client = tornadoredis.Client('172.20.20.97')
+            self.client = tornadoredis.Client('127.0.0.1')
             self.client.connect()
             print('[*] Connected to Redis server')
             yield tornado.gen.Task(self.client.subscribe, 'attack-map-production')
@@ -73,12 +72,8 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         print('[*] Closing connection.')
 
-  
-
-
     # This function is called everytime a Redis message is received
     def on_message(self, msg):
-
 
         if len(msg) == 0:
             print ("msg == 0\n")
@@ -86,7 +81,7 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
 
         if 'ip_blocked' in msg:
           ip = re.split(":",msg)
-          #fp = open('/mnt/map_attack_blk/blocklist.txt','a')
+          #fp = open('/mnt/map_attack_blk/LOG4.log','a')
           #fp.write(ip[1]+"\n")
           #fp.close()
 
@@ -94,7 +89,6 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
             json_data = json.loads(msg.body)
         except Exception as ex:
             return None
-
 
         if 'msg_type' in json_data:
             msg_type = json_data['msg_type']
@@ -205,7 +199,6 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
         else:
             ip_to_code = None
 
-
         msg_to_send = {
                         'type': msg_type,
                         'type2': msg_type2, 
@@ -230,7 +223,7 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
                         'continents_tracked': continents_tracked,
                         'countries_tracked': countries_tracked,
                         #'ips_tracked': "<a href='" + str(ips_tracked) + "'>" + str(ips_tracked) + "</a>",
-			'ips_tracked': ips_tracked,
+                        'ips_tracked': ips_tracked,
                         'unknowns': unknowns,
                         'event_time': event_time,
                         'country_to_code': country_to_code,
@@ -240,15 +233,11 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
 
         self.write_message(json.dumps(msg_to_send))
 
-
 def main():
     if getuid() != 0:
         print('Please run this script as root')
         print('SHUTTING DOWN')
         exit()
-
-    # Define the static path
-    static_path = path.join( path.dirname(__file__), 'static' )
 
     # Register handler pages
     handlers = [
@@ -257,6 +246,9 @@ def main():
                 (r'/flags/(.*)', tornado.web.StaticFileHandler, {'path': 'static/flags'}),
                 (r'/', IndexHandler)
                 ]
+    
+    # Define the static path
+    #static_path = path.join( path.dirname(__file__), 'static' )
 
     # Define static settings
     settings = {
@@ -264,11 +256,13 @@ def main():
                 }
 
     # Create and start app listening on port 8888
-    app = tornado.web.Application(handlers, **settings)
-    app.listen(8888)
-    print('[*] Waiting on browser connections...')
-    tornado.ioloop.IOLoop.instance().start()
-
+    try:
+        app = tornado.web.Application(handlers, **settings)
+        app.listen(8888)
+        print('[*] Waiting on browser connections...')
+        tornado.ioloop.IOLoop.instance().start()
+    except Exception as appFail:
+        print(appFail)
 
 if __name__ == '__main__':
     try:
