@@ -1,4 +1,4 @@
-#/usr/bin/python3
+#!/usr/bin/python3
 
 """
 AUTHOR: Matthew May - mcmay.web@gmail.com
