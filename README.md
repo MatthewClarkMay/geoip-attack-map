@@ -29,12 +29,8 @@ Tested on Ubuntu 16.04 LTS.
 * Install system dependencies:
 
   ```sh
-<<<<<<< HEAD
   sudo apt install python3-pip redis-server
-=======
   sudo apt-get install python3-pip redis-server
->>>>>>> 1336fcc01308858d750530e18e79ad4d64ba8e49
-
   ```
 * Clone the application:
 
@@ -47,7 +43,6 @@ Tested on Ubuntu 16.04 LTS.
   ```sh
   cd geoip-attack-map
   sudo pip3 install -U -r requirements.txt
-
   ```
   
 * Start Redis Server:
@@ -58,18 +53,16 @@ Tested on Ubuntu 16.04 LTS.
   ```
 * Configure the Data Server DB:
   
-    ```sh
+  ```sh
   cd DataServerDB
   ./db-dl.sh
   cd ..
-
   ```
 * Start the Data Server:
 
-    ```sh
+  ```sh
   cd DataServer
   sudo python3 DataServer.py
-
   ```
   
 * Start the Syslog Gen Script, inside DataServer directory:
@@ -77,10 +70,7 @@ Tested on Ubuntu 16.04 LTS.
   * Open a new terminal tab (Ctrl+Shift+T, on Ubuntu).
   
     ```sh
-<<<<<<< HEAD
-    ./syslog-gen.py
-=======
->>>>>>> 1336fcc01308858d750530e18e79ad4d64ba8e49
+    python3 syslog-gen.py
     ./syslog-gen.sh
     ```
 
@@ -98,11 +88,7 @@ Tested on Ubuntu 16.04 LTS.
   
     ```sh
     sudo python3 AttackMapServer.py
-<<<<<<< HEAD
     ```
-=======
-    ```  
->>>>>>> 1336fcc01308858d750530e18e79ad4d64ba8e49
  
 * Access the Attack Map Server from browser:
 
@@ -114,36 +100,29 @@ Tested on Ubuntu 16.04 LTS.
       
        ```javascript
        var webSock = new WebSocket("ws:/127.0.0.1:8888/websocket");
-<<<<<<< HEAD
        ```
      * To, for example: 
      
        ```javascript
        var webSock = new WebSocket("ws:/192.168.1.100:8888/websocket");
-=======
        ```        
      * To, for example: 
      
        ```javascript
        var webSock = new WebSocket("ws:/192.168.11.106:8888/websocket");
->>>>>>> 1336fcc01308858d750530e18e79ad4d64ba8e49
        ```
      * Restart the Attack Map Server:
      
        ```sh
        sudo python3 AttackMapServer.py
-<<<<<<< HEAD
        ```
      * On the other computer, points the browser to:
      
        ```sh
        http://192.168.1.100:8888/
-       ```
-=======
        ```       
      * On the other computer, points the browser to:
      
        ```sh
        http://192.168.11.106:8888/
-       ```    
->>>>>>> 1336fcc01308858d750530e18e79ad4d64ba8e49
+       ```
