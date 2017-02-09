@@ -10,4 +10,8 @@ DataServerDB/GeoLite2-City.mmdb
 DataServerDB/GeoLite2-City.mmdb.gz
 DataServer/__pycache__/
 
+<<<<<<< HEAD
 AttackMapServer/static/flags/*.png
+=======
+AttackMapServer/static/flags/*
+>>>>>>> 1336fcc01308858d750530e18e79ad4d64ba8e49
