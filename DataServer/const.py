@@ -34,7 +34,7 @@ META = [{
         'lookup': 'postal_code',
         'tag': 'postal',
         'path': ['code'],
-    }]
+        }]
 
 PORTMAP = {
      0:"DoS",        # Denial of Service

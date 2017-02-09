@@ -10,6 +10,7 @@ import json
 import maxminddb
 #import re
 import redis
+import io
 
 from const import META, PORTMAP
 
@@ -29,10 +30,11 @@ redis_instance = None
 
 # required input paths
 syslog_path = '/var/log/syslog'
-db_path = '/db-data/GeoLite2-City.mmdb'
+#syslog_path = '/var/log/reverse-proxy.log'
+db_path = '../DataServerDB/GeoLite2-City.mmdb'
 
 # file to log data
-log_file_out = '/var/log/map_data_server.out'
+#log_file_out = '/var/log/map_data_server.out'
 
 # ip for headquarters
 hq_ip = '8.8.8.8'
@@ -49,10 +51,11 @@ unknowns = {}
 
 # @IDEA
 #---------------------------------------------------------
-# Use a class to nicely wrap everything
-# You could attempt to do an acces here
-# now with worrying about key errors
-# Or just keep the filled data structure
+# Use a class to nicely wrap everything:
+# Could attempt to do an access here
+# now without worrying about key errors,
+# or just keep the filled data structure
+#
 #class Instance(dict):
 #
 #    defaults = {
@@ -77,7 +80,7 @@ unknowns = {}
 #                self[default] = defaults[default]
 #---------------------------------------------------------
 
-# create clean dictionary using unclean db dictionary contents
+# Create clean dictionary using unclean db dictionary contents
 def clean_db(unclean):
     selected = {}
     for tag in META:
@@ -102,10 +105,10 @@ def connect_redis(redis_ip):
 
 def get_msg_type():
     # @TODO
-    # add support for more message types later
+    # Add support for more message types later
     return "Traffic"
 
-# check to see if packet is using an interesting TCP/UDP protocol based on source or destination port
+# Check to see if packet is using an interesting TCP/UDP protocol based on source or destination port
 def get_tcp_udp_proto(src_port, dst_port):
     src_port = int(src_port)
     dst_port = int(dst_port)
@@ -149,14 +152,17 @@ def parse_maxminddb(db_path, ip):
 
 
 # @TODO
-# refactor/improve parsing
-# this function depends heavily on which appliances are generating logs
-# for now it is only here for testing
+# Refactor/improve parsing
+# This function depends heavily on which appliances are generating logs
+# For now it is only here for testing
+
 def parse_syslog(line):
     line = line.split()
     data = line[-1]
     data = data.split(',')
-    if len(data) != 4:
+
+    if len(data) != 6:
+    #if len(data) != 4:
         print('NOT A VALID LOG')
         return False
     else:
@@ -164,11 +170,17 @@ def parse_syslog(line):
         dst_ip = data[1]
         src_port = data[2]
         dst_port = data[3]
+        #test
+        type_attack = data[4]
+        cve_attack = data[5]
         data_dict = {
                     'src_ip': src_ip,
                     'dst_ip': dst_ip,
                     'src_port': src_port,
-                    'dst_port': dst_port
+                    'dst_port': dst_port,
+                    #test
+                    'type_attack': type_attack,
+                    'cve_attack': cve_attack
                     }
         return data_dict
 
@@ -278,12 +290,12 @@ def main():
     hq_dict = find_hq_lat_long(hq_ip)
 
     # follow/parse/format/publish syslog data
-    with open(syslog_path, "r") as syslog_file:
+    with io.open(syslog_path, "r", encoding='ISO-8859-1') as syslog_file:
         while True:
             where = syslog_file.tell()
             line = syslog_file.readline()
             if not line:
-                sleep(.2)
+                sleep(.1)
                 syslog_file.seek(where)
             else:
                 syslog_data_dict = parse_syslog(line)
@@ -292,7 +304,11 @@ def main():
                     if ip_db_unclean:
                         event_count += 1
                         ip_db_clean = clean_db(ip_db_unclean)
+                        
                         msg_type = {'msg_type': get_msg_type()}
+                        msg_type2 = {'msg_type2': syslog_data_dict['type_attack']}
+                        msg_type3 = {'msg_type3': syslog_data_dict['cve_attack']}
+
                         proto = {'protocol': get_tcp_udp_proto(
                                                             syslog_data_dict['src_port'],
                                                             syslog_data_dict['dst_port']
@@ -301,6 +317,8 @@ def main():
                                                 hq_dict,
                                                 ip_db_clean,
                                                 msg_type,
+                                                msg_type2,
+                                                msg_type3,
                                                 proto,
                                                 syslog_data_dict
                                                 )
@@ -309,7 +327,7 @@ def main():
                         track_stats(super_dict, continents_tracked, 'continent')
                         track_stats(super_dict, countries_tracked, 'country')
                         track_stats(super_dict, ips_tracked, 'src_ip')
-                        event_time = strftime("%Y-%m-%d %H:%M:%S", localtime()) # local time
+                        event_time = strftime("%d-%m-%Y %H:%M:%S", localtime()) # local time
                         #event_time = strftime("%Y-%m-%d %H:%M:%S", gmtime()) # UTC time
                         track_flags(super_dict, country_to_code, 'country', 'iso_code')
                         track_flags(super_dict, ip_to_code, 'src_ip', 'iso_code')
