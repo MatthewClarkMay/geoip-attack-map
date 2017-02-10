@@ -256,7 +256,7 @@
                 for (var i = 0; i < count; i++) {
                     var td = document.createElement('td');
                     if (args[i] === args[2]) {
-                        var path = 'flags/' + args[i].toLowerCase() + '.png';
+                        var path = 'flags/' + args[i] + '.png';
                         var img = document.createElement('img');
                         img.src = path;
                         td.appendChild(img);
