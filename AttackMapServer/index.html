@@ -329,7 +329,7 @@
                     tr.appendChild(td2);
 
                     // Flag
-                    var path = 'flags/' + args[2].toLowerCase() + '.png';
+                    var path = 'flags/' + args[2] + '.png';
                     var img = document.createElement('img');
                     img.src = path;
                     td3.appendChild(img);
@@ -379,7 +379,7 @@
                     value = sortedItems[i][1];
                     var keyNode = document.createTextNode(key);
                     var valueNode = document.createTextNode(value);
-                    var path = 'flags/' + codeDict[key].toLowerCase() + '.png';
+                    var path = 'flags/' + codeDict[key] + '.png';
                     var img = document.createElement('img');
                     img.src = path;
                     td1.appendChild(valueNode);
@@ -426,7 +426,7 @@
                     value = sortedItems[i][1];
                     var keyNode = document.createTextNode(key);
                     var valueNode = document.createTextNode(value);
-                    var path = 'flags/' + codeDict[key].toLowerCase() + '.png';
+                    var path = 'flags/' + codeDict[key] + '.png';
                     var img = document.createElement('img');
                     img.src = path;
                     td1.appendChild(valueNode);
