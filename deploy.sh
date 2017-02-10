@@ -16,9 +16,9 @@ cd ..
 
 # Configure AttackMapServer, extract flags to the correct place
 echo "Configuring AttackMapServer..."
-cd AttackMapServer/
-unzip static/flags.zip
-cd ..
+cd AttackMapServer/static/
+unzip flags.zip
+cd ../..
 
 echo ""
 echo "Done configuring stuff!"
