@@ -20,7 +20,7 @@ cd AttackMapServer/
 unzip static/flags.zip
 cd ..
 
+echo ""
 echo "Done configuring stuff!"
 echo "Don't forget to start the redis-server before starting DataServer.py, or AttackMapServer.py"
-echo ""
 echo "Enjoy!"
