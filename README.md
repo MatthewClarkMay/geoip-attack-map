@@ -26,16 +26,17 @@ If you find any errors or bugs, please let me know. Questions and feedback are a
 ### Deploy example
 Tested on Ubuntu 16.04 LTS.
 
+* Clone the application:
+
+  ```sh
+  git clone https://github.com/matthewclarkmay/geoip-attack-map.git
+  ```
+
 * Install system dependencies:
 
   ```sh
   sudo apt install python3-pip redis-server
 
-  ```
-* Clone the application:
-
-  ```sh
-  git clone https://github.com/matthewclarkmay/geoip-attack-map.git
   ```
 
 * Install python requirements:
@@ -82,7 +83,6 @@ Tested on Ubuntu 16.04 LTS.
   * Open a new terminal tab (Ctrl+Shift+T, on Ubuntu).
   
     ```sh
-    cd ..
     cd AttackMapServer/
     unzip static/flags-mini.zip -d static/flags
     ``` 
