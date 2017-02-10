@@ -84,7 +84,7 @@ Tested on Ubuntu 16.04 LTS.
   
     ```sh
     cd AttackMapServer/
-    unzip static/flags-mini.zip -d static/flags
+    unzip static/flags.zip
     ``` 
  
 * Start the Attack Map Server:
