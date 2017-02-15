@@ -208,7 +208,7 @@ def shutdown_and_report_stats():
     exit()
 
 
-def menu():
+#def menu():
     # Instantiate parser
     #parser = ArgumentParser(
     #        prog='DataServer.py',
@@ -230,8 +230,8 @@ def menu():
     #parser.add_argument('-v', '--verbose', action='store_true', dest='verbose', help='run server in verbose mode')
 
     # Parse arguments/options
-    args = parser.parse_args()
-    return args
+    #args = parser.parse_args()
+    #return args
 
 
 def merge_dicts(*args):
@@ -277,7 +277,7 @@ def main():
     global db_path, log_file_out, redis_ip, redis_instance, syslog_path, hq_ip
     global continents_tracked, countries_tracked, ips_tracked, postal_codes_tracked, event_count, unknown, ip_to_code, country_to_code
 
-    args = menu()
+    #args = menu()
 
     # Connect to Redis
     redis_instance = connect_redis(redis_ip)
