@@ -17,7 +17,7 @@ from const import META, PORTMAP
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from os import getuid
 from sys import exit
-from textwrap import dedent
+#from textwrap import dedent
 from time import gmtime, localtime, sleep, strftime
 
 # start the Redis server if it isn't started already.
@@ -40,7 +40,7 @@ db_path = '../DataServerDB/GeoLite2-City.mmdb'
 hq_ip = '8.8.8.8'
 
 # stats
-#server_start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+server_start_time = strftime("%d-%m-%Y %H:%M:%S", localtime()) # local time
 event_count = 0
 continents_tracked = {}
 countries_tracked = {}
@@ -162,7 +162,6 @@ def parse_syslog(line):
     data = data.split(',')
 
     if len(data) != 6:
-    #if len(data) != 4:
         print('NOT A VALID LOG')
         return False
     else:
@@ -170,7 +169,6 @@ def parse_syslog(line):
         dst_ip = data[1]
         src_port = data[2]
         dst_port = data[3]
-        #test
         type_attack = data[4]
         cve_attack = data[5]
         data_dict = {
@@ -178,7 +176,6 @@ def parse_syslog(line):
                     'dst_ip': dst_ip,
                     'src_port': src_port,
                     'dst_port': dst_port,
-                    #test
                     'type_attack': type_attack,
                     'cve_attack': cve_attack
                     }
@@ -187,7 +184,7 @@ def parse_syslog(line):
 
 def shutdown_and_report_stats():
     print('\nSHUTTING DOWN')
-    # report stats tracked
+    # Report stats tracked
     print('\nREPORTING STATS...')
     print('\nEvent Count: {}'.format(event_count)) # report event count
     print('\nContinent Stats...') # report continents stats 
@@ -208,32 +205,31 @@ def shutdown_and_report_stats():
     print('\nUnknowns...')
     for key in unknowns:
         print('{}: {}'.format(key, unknowns[key]))
-    # log stats tracked
     exit()
 
 
 def menu():
-    # instantiate parser
-    parser = ArgumentParser(
-            prog='DataServer.py',
-            usage='%(progs)s [OPTIONS]',
-            formatter_class=RawDescriptionHelpFormatter,
-            description=dedent('''\
-                    --------------------------------------------------------------
-                    Data server for attack map application.
-                    --------------------------------------------------------------'''))
+    # Instantiate parser
+    #parser = ArgumentParser(
+    #        prog='DataServer.py',
+    #        usage='%(progs)s [OPTIONS]',
+    #        formatter_class=RawDescriptionHelpFormatter,
+    #        description=dedent('''\
+    #                --------------------------------------------------------------
+    #                Data server for attack map application.
+    #                --------------------------------------------------------------'''))
 
     # @TODO --> Add support for command line args?
-    # define command line arguments
-    # parser.add_argument('-db', '--database', dest='db_path', required=True, type=str, help='path to maxmind database')
-    # parser.add_argument('-m', '--readme', dest='readme', help='print readme')
-    # parser.add_argument('-o', '--output', dest='output', help='file to write logs to')
-    # parser.add_argument('-r', '--random', action='store_true', dest='randomize', help='generate random IPs/protocols for demo')
-    # parser.add_argument('-rs', '--redis-server-ip', dest='redis_ip', type=str, help='redis server ip address')
-    # parser.add_argument('-sp', '--syslog-path', dest='syslog_path', type=str, help='path to syslog file')
-    parser.add_argument('-v', '--verbose', action='store_true', dest='verbose', help='run server in verbose mode')
+    #define command line arguments
+    #parser.add_argument('-db', '--database', dest='db_path', required=True, type=str, help='path to maxmind database')
+    #parser.add_argument('-m', '--readme', dest='readme', help='print readme')
+    #parser.add_argument('-o', '--output', dest='output', help='file to write logs to')
+    #parser.add_argument('-r', '--random', action='store_true', dest='randomize', help='generate random IPs/protocols for demo')
+    #parser.add_argument('-rs', '--redis-server-ip', dest='redis_ip', type=str, help='redis server ip address')
+    #parser.add_argument('-sp', '--syslog-path', dest='syslog_path', type=str, help='path to syslog file')
+    #parser.add_argument('-v', '--verbose', action='store_true', dest='verbose', help='run server in verbose mode')
 
-    # parse arguments/options
+    # Parse arguments/options
     args = parser.parse_args()
     return args
 
@@ -283,14 +279,15 @@ def main():
 
     args = menu()
 
-    # connect to Redis
+    # Connect to Redis
     redis_instance = connect_redis(redis_ip)
 
-    # find HQ lat/long
+    # Find HQ lat/long
     hq_dict = find_hq_lat_long(hq_ip)
 
-    # follow/parse/format/publish syslog data
+    # Follow/parse/format/publish syslog data
     with io.open(syslog_path, "r", encoding='ISO-8859-1') as syslog_file:
+        syslog_file.readlines()
         while True:
             where = syslog_file.tell()
             line = syslog_file.readline()
@@ -345,12 +342,12 @@ def main():
                         json_data = json.dumps(super_dict)
                         redis_instance.publish('attack-map-production', json_data)
 
-                        if args.verbose:
-                            print(ip_db_unclean)
-                            print('------------------------')
-                            print(json_data)
-                            print('Event Count: {}'.format(event_count))
-                            print('------------------------')
+                        #if args.verbose:
+                        #    print(ip_db_unclean)
+                        #    print('------------------------')
+                        #    print(json_data)
+                        #    print('Event Count: {}'.format(event_count))
+                        #    print('------------------------')
 
                         print('Event Count: {}'.format(event_count))
                         print('------------------------')
