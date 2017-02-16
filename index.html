@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Attack Map - v4</title>
+
+        <!--SCRIPT LINKS-->
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+        <script src='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js'></script>
+        <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+
+        <!--BOOTSTRAP JS LINKS-->
+        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+        <!--CSS LINKS-->
+        <link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet' />
+        <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+        <link href='static/index.css'rel='stylesheet'/>
+
+        <!--BOOTSTRAP CSS LINKS-->
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+
+	<script src='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js'></script>
+	<link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet' />
+	<style>
+  	body { margin:0; padding:0; }
+  	#map { position:absolute; top:0; bottom:0; width:100%; }
+	</style>
+
+
+    </head>
+    <body>
+
+        <div id="map" class='dark'></div>
+
+        <script type="text/javascript">
+
+            // To access by a browser in another computer, use the external IP of machine running AttackMapServer
+            // from the same computer(only), you can use the internal IP.
+            // Example:
+            // - AttackMapServer machine:
+            //   - Internal IP: 127.0.0.1
+            //   - External IP: 192.168.11.106
+            var webSock = new WebSocket("ws:/127.0.0.1:8888/websocket");
+            //var webSock = new WebSocket("ws:/192.168.11.106:8888/websocket");
+
+
+         // link map
+
+
+
+
+            L.mapbox.accessToken = "pk.eyJ1IjoibW1heTYwMSIsImEiOiJjaWgyYWU3NWQweWx2d3ltMDl4eGk5eWY1In0.9YoOkALPP7zaoim34ZITxw";
+
+
+          //  var map = L.mapbox.map("map", "mmay601.p9if994e", {
+            //        center: [0, 0], // lat, long
+              //      zoom: 2
+                //    });
+
+
+	  //  var map = L.mapbox.map("map", "mapbox.streets", {
+	    var map = L.mapbox.map("map", "mapbox.satellite", {
+                    center: [0, 0], // lat, long
+                    zoom: 2
+                    });
+
+
+
+	
+// The HTML we put in bindPopup doesn't exist yet, so we can't just say
+// $('#mybutton'). Instead, we listen for click events on the map element which
+// will bubble up from the tooltip, once it's created and someone clicks on it.
+//$('#map').on('click', '.trigger', function() {
+//    alert('Hello from Toronto!');
+//});
+
+
+
+            // add full screen option
+           // L.control.fullscreen().addTo(map);
+
+            // add hq coords
+            //var hqLatLng = new L.LatLng(37.3845, -122.0881);
+            var hqLatLng = new L.LatLng(-15.753912, -47.8809987);
+
+            // add circle
+          //  L.circle(hqLatLng, 110000, {
+            //    color: 'red',
+            //    fillColor: 'yellow',
+              //  fillOpacity: 0.5,
+              //  }).addTo(map);
+
+            // Append <svg> to map
+            var svg = d3.select(map.getPanes().overlayPane).append("svg")
+                .attr("class", "leaflet-zoom-animated")
+                .attr("width", window.innerWidth)
+                .attr("height", window.innerHeight);
+
+            // Append <g> to svg
+            //var g = svg.append("g").attr("class", "leaflet-zoom-hide");
+
+            function translateSVG() {
+                var viewBoxLeft = document.querySelector("svg.leaflet-zoom-animated").viewBox.animVal.x;
+                var viewBoxTop = document.querySelector("svg.leaflet-zoom-animated").viewBox.animVal.y;
+                // Resizing width and height in case of window resize
+                svg.attr("width", window.innerWidth);
+                svg.attr("height", window.innerHeight);
+
+                // Adding the ViewBox attribute to our SVG to contain it
+                svg.attr("viewBox", function () {
+                    return "" + viewBoxLeft + " " + viewBoxTop + " "  + window.innerWidth + " " + window.innerHeight;
+                });
+                // Adding the style attribute to our SVG to translate it
+                svg.attr("style", function () {
+                    return "transform: translate3d(" + viewBoxLeft + "px, " + viewBoxTop + "px, 0px);";
+                });
+            }
+
+            function update() {
+                translateSVG();
+                // additional stuff
+            }
+
+            // Re-draw on reset, this keeps the markers where they should be on reset/zoom
+
+            map.on("moveend", update);
+            //update();
+
+            function calcMidpoint(x1, y1, x2, y2, bend) {
+                if(y2<y1 && x2<x1)
+                {
+                    var tmpy = y2;
+                    var tmpx = x2;
+                    x2 = x1;
+                    y2 = y1;
+                    x1 = tmpx;
+                    y1 = tmpy;
+                }
+                else if(y2<y1) {
+            	    y1 = y2 + (y2=y1, 0);
+                }
+                else if(x2<x1) {
+            	    x1 = x2 + (x2=x1, 0);
+                }
+
+                var radian = Math.atan(-((y2-y1)/(x2-x1)));
+                var r = Math.sqrt(x2-x1) + Math.sqrt(y2-y1);
+                var m1 = (x1+x2)/2;
+                var m2 = (y1+y2)/2;
+
+                var min = 2.5, max = 7.5;
+                //var min = 1, max = 7;
+                var arcIntensity = parseFloat((Math.random() * (max - min) + min).toFixed(2));
+
+                if (bend === true) {
+            	    var a = Math.floor(m1 - r * arcIntensity * Math.sin(radian));
+            	    var b = Math.floor(m2 - r * arcIntensity * Math.cos(radian));
+                } else {
+            	    var a = Math.floor(m1 + r * arcIntensity * Math.sin(radian));
+            	    var b = Math.floor(m2 + r * arcIntensity * Math.cos(radian));
+                }
+
+                return {"x":a, "y":b};
+            }
+
+            function translateAlong(path) {
+                var l = path.getTotalLength();
+                return function(i) {
+                    return function(t) {
+                    // Put in try/catch because sometimes floating point is stupid..
+                    try {
+                        var p = path.getPointAtLength(t*l);
+                        return "translate(" + p.x + "," + p.y + ")";
+                    } catch(err){
+                        console.log("Caught exception.");
+                        return "ERROR";
+                        }
+                    }
+                }
+            }
+
+            function handleParticle(msg, srcPoint) {
+                var i = 0;
+                var x = srcPoint['x'];
+                var y = srcPoint['y'];
+
+                svg.append('circle')
+                    .attr('cx', x)
+                    .attr('cy', y)
+                    .attr('r', 1e-6)
+                    .style('fill', 'none')
+                    //.style('stroke', d3.hsl((i = (i + 1) % 360), 1, .5))
+                    .style('stroke', msg.color)
+                    .style('stroke-opacity', 1)
+                        .transition()
+                        .duration(2000)
+                        .ease(Math.sqrt)
+                        .attr('r', 35)
+                        .style('stroke-opacity', 1e-6)
+                        .remove();
+
+                //d3.event.preventDefault();
+            }
+
+
+	    function handleTraffic2(msg_color, src_lat, src_long ){
+
+
+		var srcLatLng = new L.LatLng(src_lat, src_long);
+                var hqPoint = map.latLngToLayerPoint(hqLatLng);
+                var srcPoint = map.latLngToLayerPoint(srcLatLng);
+
+		console.log("teste");
+		console.log(srcLatLng +" "+  hqPoint+" " +srcPoint);
+		
+
+		handleTraffic3(msg_color, srcPoint, hqPoint);
+
+	    }
+
+	     function handleTraffic3(msg_color, srcPoint, hqPoint) {
+                var toX = srcPoint['x'];
+                var toY = srcPoint['y'];
+                var fromX = hqPoint['x'];
+                var fromY = hqPoint['y'];
+
+		var tmp=hqPoint['x'];
+		hqPoint['x']=srcPoint['x'];
+		srcPoint['x']=tmp;
+
+		tmp=hqPoint['y'];
+                hqPoint['y']=srcPoint['y'];
+                srcPoint['y']=tmp;
+
+
+                var bendArray = [true, false];
+                var bend = bendArray[Math.floor(Math.random() * bendArray.length)];
+
+                lineData = [srcPoint, calcMidpoint(fromX, fromY, toX, toY, bend), hqPoint]
+
+                var lineFunction = d3.svg.line()
+                    .interpolate("basis")
+                    .x(function(d) {return d.x;})
+                    .y(function(d) {return d.y;});
+
+                var lineGraph = svg.append('path')
+                                .attr('d', lineFunction(lineData))
+                                .attr('opacity', 0.8)
+                                .attr('stroke', "#FFFC00")
+                                .attr('stroke-width', 0)
+                                .attr('fill', 'none');
+
+		console.log(msg_color);
+
+                if (translateAlong(lineGraph.node()) === 'ERROR') {
+                    console.log('translateAlong ERROR')
+                    return;
+                }
+
+                circleRadius = 6
+
+                // Circle follows the line
+
+		 for (var i = 0; i < 3; i++) {
+
+		var dot = svg.append('circle')
+                    .attr('r', circleRadius)
+                    .attr('fill', "#FF0000")
+                    .transition()
+                        .duration(2000)
+                        .ease('ease-in')
+                        .attrTween('transform', translateAlong(lineGraph.node()))
+                        .each('end', function() {
+                                d3.select(this)
+                                    .transition()
+                                    .duration(900)
+                                    .attr('r', circleRadius * 20.5)
+                                    .style('opacity', 0)
+                                    .remove();
+                        });
+		}
+
+                var length = lineGraph.node().getTotalLength();
+                lineGraph.attr('stroke-dasharray', length + ' ' + length)
+                    .attr('stroke-dashoffset', length)
+                    .transition()
+                        .duration(0)
+                        .ease('ease-in')
+                        .attr('stroke-dashoffset', 0)
+                        .each('end', function() {
+                                d3.select(this)
+                                    .transition()
+                                    .duration(0)
+                                    .style('opacity', 0)
+                                    .remove();
+                       });
+            }
+
+
+            function handleTraffic(msg_color, srcPoint, hqPoint) {
+                var fromX = srcPoint['x'];
+                var fromY = srcPoint['y'];
+                var toX = hqPoint['x'];
+                var toY = hqPoint['y'];
+                var bendArray = [true, false];
+                var bend = bendArray[Math.floor(Math.random() * bendArray.length)];
+
+                lineData = [srcPoint, calcMidpoint(fromX, fromY, toX, toY, bend), hqPoint]
+
+                var lineFunction = d3.svg.line()
+                    .interpolate("basis")
+                    .x(function(d) {return d.x;})
+                    .y(function(d) {return d.y;});
+
+                var lineGraph = svg.append('path')
+                                .attr('d', lineFunction(lineData))
+                                .attr('opacity', 0.8)
+                                .attr('stroke', msg_color)
+                                .attr('stroke-width', 2)
+                                .attr('fill', 'none');
+
+                if (translateAlong(lineGraph.node()) === 'ERROR') {
+                    console.log('translateAlong ERROR')
+                    return;
+                }
+
+                circleRadius = 6
+
+                // Circle follows the line
+                var dot = svg.append('circle')
+                    .attr('r', circleRadius)
+                    .attr('fill', msg_color)
+                    .transition()
+                        .duration(700)
+                        .ease('ease-in')
+                        .attrTween('transform', translateAlong(lineGraph.node()))
+                        .each('end', function() {
+                                d3.select(this)
+                                    .transition()
+                                    .duration(500)
+                                    .attr('r', circleRadius * 2.5)
+                                    .style('opacity', 0)
+                                    .remove();
+                        });
+
+                var length = lineGraph.node().getTotalLength();
+                lineGraph.attr('stroke-dasharray', length + ' ' + length)
+                    .attr('stroke-dashoffset', length)
+                    .transition()
+                        .duration(700)
+                        .ease('ease-in')
+                        .attr('stroke-dashoffset', 0)
+                        .each('end', function() {
+                                d3.select(this)
+                                    .transition()
+                                    .duration(100)
+                                    .style('opacity', 0)
+                                    .remove();
+                        });
+            }
+
+            var circles = new L.LayerGroup();
+            map.addLayer(circles);
+
+            function addCircle(msg, srcLatLng) {
+                circleCount = circles.getLayers().length;
+                circleArray = circles.getLayers();
+                if (circleCount >= 50) {
+                    circles.removeLayer(circleArray[0]);
+                }
+                L.circle(srcLatLng, 50000, { 
+                    color: msg.color,
+                    fillColor: msg.color,
+                    fillOpacity: 0.2,
+                    }).addTo(circles);
+            }
+
+            function prependAttackRow(id, args) {
+                var tr = document.createElement('tr');
+                count = args.length;
+                for (var i = 0; i < count; i++) {
+                    var td = document.createElement('td');
+                    if (args[i] === args[2]) {
+
+  			 // if flag is indefined or null
+
+			if (args[i] == null)
+				var path = 'flags/' + '00.png';
+			else
+                        var path = 'flags/' + args[i] + '.png';
+                        var img = document.createElement('img');
+                        img.src = path;
+                        td.appendChild(img);
+                        tr.appendChild(td);
+                    } 
+		    else {
+                        var textNode = document.createTextNode(args[i]);
+                        td.appendChild(textNode);
+                        tr.appendChild(td);
+                    }
+                }
+                var element = document.getElementById(id);
+                var rowCount = element.rows.length;
+                if (rowCount >= 50) {
+                    element.deleteRow(rowCount -1);
+                }
+		
+                element.insertBefore(tr, element.firstChild);
+            }
+
+	   function prependTypeRow(id, args) {
+	    var tr = document.createElement('tr');
+                count = args.length;
+                for (var i = 0; i < count; i++) {
+                    var td = document.createElement('td');
+                        var textNode = document.createTextNode(args[i]);
+                        td.appendChild(textNode);
+                        tr.appendChild(td);
+                }
+                var element = document.getElementById(id);
+                var rowCount = element.rows.length;
+                if (rowCount >= 6) {
+                    element.deleteRow(rowCount -1);
+                }
+                element.insertBefore(tr, element.firstChild);
+            }
+
+	    function prependCVERow(id, args) {
+
+             var tr = document.createElement('tr');
+                //count = args.length;
+		count = 1;
+                for (var i = 0; i < count; i++) {
+
+                   
+		    var td1 = document.createElement('td');
+		    var td2 = document.createElement('td');
+                    var td3 = document.createElement('td');
+		    var td4 = document.createElement('td');
+
+
+
+		    // teste
+
+		         var td5 = document.createElement('td');
+		 	 var td6 = document.createElement('td');	
+			 var td7 = document.createElement('td');
+
+                      td5.setAttribute("type", "hidden");
+                      td6.setAttribute("type", "hidden");
+                      td7.setAttribute("type", "hidden");
+			
+			
+		    ////
+
+
+		    //timestamp
+
+                    var textNode2 = document.createTextNode(args[0]);
+                        td1.appendChild(textNode2);
+                        tr.appendChild(td1);
+
+                    ///////////////
+
+
+		     //exploit
+
+                     var textNode = document.createTextNode(args[1]);
+
+
+                     var alink = document.createElement('a');
+                    alink.setAttribute("href",args[1]);
+                    alink.setAttribute("target","_blank")
+                    alink.style.color = "white";
+                    alink.appendChild(textNode);
+
+
+                    td2.appendChild(alink);
+                    tr.appendChild(td2);
+
+                    /////////////////////////
+
+
+
+		    //bandeira
+
+			// if flag is indefined or null
+
+                        if (args[3] == null) 
+                                var path = 'flags/' + '00.png';
+                        else
+			var path = 'flags/' + args[3] + '.png';
+                        var img = document.createElement('img');
+                        img.src = path;
+                        td3.appendChild(img);
+                        tr.appendChild(td3);
+
+		    ///////////////////////////
+		
+		   //IP
+
+                    var textNode3 = document.createTextNode(args[2]);
+			
+                    var alink2 = document.createElement('a');
+                    alink2.setAttribute("href","#");
+		    alink2.setAttribute("class","showInfo");
+                    alink2.style.color = "white";
+                    alink2.appendChild(textNode3);
+
+
+
+                        td4.appendChild(alink2);
+                        tr.appendChild(td4);
+
+                    ///////////////
+
+
+		   //Informacoes ocultas
+
+      		      var ip_mod = args[2].replace(/\./g , '-');
+
+
+	              var blk_color = document.createElement('input');
+                      blk_color.setAttribute("name", "msg_color");
+		      blk_color.setAttribute("type", "hidden");	     
+		      var atrib1="id1-".concat(ip_mod);
+		      blk_color.setAttribute("id", atrib1);
+                      blk_color.setAttribute("value", args[9]);
+
+                      var blk_src_lat = document.createElement('input');
+                      blk_src_lat.setAttribute("name", "blk_src_lat");
+		      blk_src_lat.setAttribute("type", "hidden");
+		      var atrib2="id2-".concat(ip_mod);
+                      blk_src_lat.setAttribute("id", atrib2);
+                      blk_src_lat.setAttribute("value", args[7]);
+                        
+                      var blk_src_long = document.createElement('input');
+                      blk_src_long.setAttribute("name", "blk_src_long");
+		      blk_src_long.setAttribute("type", "hidden");
+		      var atrib3="id3-".concat(ip_mod);
+                      blk_src_long.setAttribute("id", atrib3);
+                      blk_src_long.setAttribute("value", args[8]);
+                    
+
+                      td5.appendChild(blk_color);
+		      tr.appendChild(td5);
+                      td6.appendChild(blk_src_lat);
+		      tr.appendChild(td6);
+                      td7.appendChild(blk_src_long);
+		      tr.appendChild(td7);
+		   //
+
+
+
+
+                }
+                var element = document.getElementById(id);
+                var rowCount = element.rows.length;
+                if (rowCount >= 30) {
+                    element.deleteRow(rowCount -1);
+                }
+                element.insertBefore(tr, element.firstChild);
+            }
+
+
+
+	   function redrawTargetIP(hashID, id, countList, codeDict, msg) {
+                $(hashID).empty();
+                var element = document.getElementById(id);
+
+                // sort ips greatest to least
+                    // create items array from dict
+                var items = Object.keys(countList[0]).map(function(key) {
+                        return [key, countList[0][key]];
+                });
+                    // sort the array based on the second element
+                items.sort(function(first, second) {
+                        return second[1] - first[1];
+                });
+                    // create new array with only the first 50 items
+                var sortedItems = items.slice(0, 50);
+
+                var itemsLength = sortedItems.length;
+                for (var i = 0; i < itemsLength; i++) {
+		 tr = document.createElement('tr');
+                    td1 = document.createElement('td');
+                    td2 = document.createElement('td');
+                    td3 = document.createElement('td');
+
+                    var key = sortedItems[i][0];
+                    value = sortedItems[i][1];
+                    var keyNode = document.createTextNode(key);
+                    var valueNode = document.createTextNode(value);
+
+                    // if flag is indefined or null
+
+                        if (codeDict[key] == null) 
+                                var path = 'flags/' + '00.png';
+		   else
+                    var path = 'flags/' + codeDict[key] + '.png';
+                    var img = document.createElement('img');
+                    img.src = path;
+                    td1.appendChild(valueNode);
+                    td2.appendChild(img);
+                    
+
+                    td3.appendChild(keyNode);
+
+
+
+                    tr.appendChild(td1);
+                    tr.appendChild(td3);
+                    tr.appendChild(td2);
+
+
+                    element.appendChild(tr);
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+	    function redrawCountIP(hashID, id, countList, codeDict, msg) {
+                $(hashID).empty();
+                var element = document.getElementById(id);
+
+                // sort ips greatest to least
+                    // create items array from dict
+                var items = Object.keys(countList[0]).map(function(key) {
+                        return [key, countList[0][key]];
+                });
+                    // sort the array based on the second element
+                items.sort(function(first, second) {
+                        return second[1] - first[1];
+                });
+                    // create new array with only the first 50 items
+                var sortedItems = items.slice(0, 50);
+
+                var itemsLength = sortedItems.length;
+                for (var i = 0; i < itemsLength; i++) {
+                    tr = document.createElement('tr');
+                    td1 = document.createElement('td');
+                    td2 = document.createElement('td');
+                    td3 = document.createElement('td');
+
+                    var key = sortedItems[i][0];
+                    value = sortedItems[i][1];
+                    var keyNode = document.createTextNode(key);
+                    var valueNode = document.createTextNode(value);
+
+		    // if flag is indefined or null
+
+                        if (codeDict[key] == null) 
+                                var path = 'flags/' + '00.png';
+                        else
+                    var path = 'flags/' + codeDict[key] + '.png';
+                    var img = document.createElement('img');
+                    img.src = path;
+                    td1.appendChild(valueNode);
+                    td2.appendChild(img);
+                    
+
+                    var alink = document.createElement('a');
+                    alink.setAttribute("href","#");
+                    alink.setAttribute("class","showInfo");
+		    alink.style.color = "white";	    
+                    alink.appendChild(keyNode);
+		    td3.appendChild(alink);
+
+
+
+                    tr.appendChild(td1);
+                    tr.appendChild(td3);
+                    tr.appendChild(td2);
+
+
+                    element.appendChild(tr);
+                }
+            }
+	
+		function redrawCountIP2(hashID, id, countList, codeDict) {
+		
+		$(hashID).empty();
+                var element = document.getElementById(id);
+
+                // sort ips greatest to least
+                    // create items array from dict
+                var items = Object.keys(countList[0]).map(function(key) {
+                        return [key, countList[0][key]];
+                });
+                    // sort the array based on the second element
+                items.sort(function(first, second) {
+                        return second[1] - first[1];
+                });
+                    // create new array with only the first 50 items
+                var sortedItems = items.slice(0, 50);
+
+                var itemsLength = sortedItems.length;
+                for (var i = 0; i < itemsLength; i++) {
+                    tr = document.createElement('tr');
+                    td1 = document.createElement('td');
+                    td2 = document.createElement('td');
+                    td3 = document.createElement('td');
+                    var key = sortedItems[i][0];
+                    value = sortedItems[i][1];
+                    var keyNode = document.createTextNode(key);
+                    var valueNode = document.createTextNode(value);
+
+		    // if flag is indefined or null
+
+                        if (codeDict[key] == null)
+                                var path = 'flags/' + '00.png';
+                        else
+                    var path = 'flags/' + codeDict[key] + '.png';
+                    var img = document.createElement('img');
+                    img.src = path;
+                    td1.appendChild(valueNode);
+                    td2.appendChild(img);
+                    td3.appendChild(keyNode);
+                    tr.appendChild(td1);
+                    tr.appendChild(td3);
+                    tr.appendChild(td2);
+
+                element.appendChild(tr);
+                }
+            }
+
+
+            function handleLegend(msg) {
+                var ipCountList = [msg.ips_tracked,
+                                   msg.iso_code];
+                var countryCountList = [msg.countries_tracked,
+                                        msg.iso_code];
+                var attackList = [msg.event_time,
+                                  msg.src_ip,
+                                  msg.iso_code,
+                                  msg.country,
+                                  msg.city,
+                                  msg.protocol];
+
+		var attackTarget = [msg.ips_tracked2,
+                                   msg.iso_code];
+
+                redrawCountIP('#ip-tracking','ip-tracking', ipCountList, msg.ip_to_code, msg);
+                redrawCountIP2('#country-tracking', 'country-tracking', countryCountList, msg.country_to_code);
+                prependAttackRow('attack-tracking', attackList);
+		redrawTargetIP('#ip-target','ip-target', attackTarget, msg.ip_to_code, msg);
+		
+            }
+
+
+             function handleLegendType(msg) {
+                var attackType = [msg.type2];
+		 var attackCve = [msg.event_time,
+				   msg.type3,
+                                  msg.src_ip,
+                                  msg.iso_code,
+                                  msg.country,
+                                  msg.city,
+                                  msg.protocol,
+				  msg.src_lat,
+				  msg.src_long,
+			          msg.color];
+
+                if (attackType != "___")
+                prependTypeRow('attack-type', attackType);
+
+                if (attackCve[1] != "___"){                
+
+			prependCVERow('attack-cveresp', attackCve);
+		}
+
+             }
+
+
+            //WEBSOCKET STUFF
+	    
+
+            webSock.onmessage = function (e) {
+                console.log("Got a websocket message...");
+                try {
+                    var msg = JSON.parse(e.data);
+                    console.log(msg);
+                    switch(msg.type) {
+                        case "Traffic":
+                            console.log("Traffic!");
+
+                            var srcLatLng = new L.LatLng(msg.src_lat, msg.src_long);
+                            var hqPoint = map.latLngToLayerPoint(hqLatLng);
+                            var srcPoint = map.latLngToLayerPoint(srcLatLng);
+                            console.log('');
+
+                            addCircle(msg, srcLatLng);
+                            handleParticle(msg, srcPoint);
+
+
+                            handleTraffic(msg.color, srcPoint, hqPoint, srcLatLng);
+				
+                            handleLegend(msg);
+			    handleLegendType(msg)
+
+
+                            break;
+                    //add support for other message types
+                    }
+                } catch(err) {
+                    console.log(err)
+                }
+            };
+
+
+        $(document).on("click","#informIP #fechar", function (e) {
+    		 $("#informIP").hide();		
+	});
+
+	$(document).on("click", '.container-fluid .showInfo', function(e){
+		var iplink = $(this).text();
+		$("#informIP").show();
+		$("#informIP").html( "<a id='ip_only' href='" +iplink +  "'></a>   <button id='fechar'>X</button> <h3>"+iplink+"</h3><br><ul><li><a target = '_blank'  href='http://www.senderbase.org/lookup/?search_string="  +iplink+ "'><b><u>Senderbase</a></li><li><a target='_blank' href='https://ers.trendmicro.com/reputations/index'>Trend Micro</a></li><li><a target='_blank' href='http://www.anti-abuse.org/multi-rbl-check-results/?host=" +iplink+ "'>Anti-abuse</a></li></ul><br> <button id='blockIP' alt='"+iplink+ "'>Bloquear IP</button>   ");
+
+	});
+
+
+	 $(document).on("click", '.col-md-8 .showInfo', function(e){
+
+
+		var iplink = $(this).text();
+		
+
+		 $("#informIP").show();
+		$("#informIP").html( "<input type='hidden' id='444' value='kk'><a id='ip_only' href='" +iplink +  "'></a>   <button id='fechar'>X</button> <h3>"+iplink+"</h3><br><ul><li><a target = '_blank'  href='http://www.senderbase.org/lookup/?search_string="  +iplink+ "'><b><u>Senderbase</a></li><li><a target='_blank' href='https://ers.trendmicro.com/reputations/index'>Trend Micro</a></li><li><a target='_blank' href='http://www.anti-abuse.org/multi-rbl-check-results/?host=" +iplink+ "'>Anti-abuse</a></li></ul><br> <button id='blockIP' alt='"+iplink+ "'>Bloquear IP</button>   ");
+		
+       })
+	
+
+	$(document).on("click","#informIP #blockIP", function (e) {
+            var ip= $(this).attr('alt');
+
+		var ip_mod = ip.replace(/\./g , '-');
+
+
+                var ip_color_id = "#id1-".concat(ip_mod);
+                ip_color= ($(ip_color_id).val());
+
+                var ip_lat_id = "#id2-".concat(ip_mod);
+                ip_lat= ($(ip_lat_id).val());
+
+                var ip_long_id = "#id3-".concat(ip_mod);
+                ip_long= ($(ip_long_id).val());
+
+		for (var i = 0; i < 3; i++) {
+	
+			//handleTraffic2(ip_color, ip_lat, ip_long );
+
+			setTimeout(function() {
+       			 handleTraffic2(ip_color, ip_lat, ip_long );
+    			}, 100);    
+		}
+
+
+	    var ipBlocked = "ip_blocked:"+ip;
+	    console.log("Sending message: "+ipBlocked);
+	    webSock.send(ipBlocked);
+		
+        });
+
+        </script>
+
+
+	<div id='informIP'>
+
+        </div>
+
+
+        <div class='container-fluid'>
+
+            <div class='row'>
+
+                 <div class='col-md-1'>
+                    <table class='table table-condensed' id='ip-origin-table'>
+                        <thead>
+                            <tr>
+                                <th>Qtd</th>
+                                <th>Alvo</th>
+				<th></th>
+                            </tr>
+                        </thead>
+                        <tbody id='ip-target'>
+                            <!--APPEND CONTENT HERE-->
+                        </tbody>
+                    </table> <!--close continent-origin-table-->
+                </div> <!--close continent-origin col-->
+
+
+
+
+
+                <div class='col-md-2'>
+                    <table class='table table-condensed' id='ip-origin-table'>
+                        <thead>
+                            <tr>
+			        <th>Qtd</th>
+                                <th>IP</th>
+                            </tr>
+                        </thead>
+                        <tbody id='ip-tracking'>
+                            <!--APPEND CONTENT HERE-->
+                        </tbody>
+                    </table> <!--close continent-origin-table-->
+                </div> <!--close continent-origin col-->
+
+                <div class='col-md-2'>
+                    <table class='table table-condensed' id='country-origin-table'>
+                        <thead>
+                            <tr>
+                                <th>Qtd</th>
+                                <th>País</th>
+                            </tr>
+                        </thead>
+                        <tbody id='country-tracking'>
+                            <!--APPEND CONTENT HERE-->
+                        </tbody>
+                    </table> <!--close country-origin-table-->
+                </div> <!--close country-origin col-->
+
+                <div class='col-md-7'>
+                    <table class='table table-condensed' id='live-attacks-table'>
+                        <thead>
+                            <tr>
+                                <th style='width:20%;'>Timestamp</th>
+                                <th style='width:10%;'>IP</th>
+                                <th style='width:10%;'></th>
+                                <th style='width:10%;'>País</th>
+                                <th style='width:10%;'>Cidade</th>
+                                <th style='width:10%;'>Serviço</th>
+                            </tr>
+                        </thead>
+                        <tbody id='attack-tracking'>
+                        <!--APPEND TABLE ROWS HERE-->
+                        </tbody>
+                    </table> <!--close live-attacks-table-->
+                </div> <!--close live-attack col-->
+            </div> <!--close row-->
+        </div> <!--close dashboard-->
+
+	<div class='col-md-4'>
+                    <table class='table table-condensed' id='type-attacks-table'>
+                        <thead>
+                            <tr>
+                                <th style='width:20%;'>Tipos de Ataques</th>
+                            </tr>
+                        </thead>
+                        <tbody id='attack-type'>
+                        <!--APPEND TABLE ROWS HERE-->
+                        </tbody>
+                    </table> <!--close live-attacks-table-->
+                </div> <!--close live-attack col-->
+            </div> <!--close row-->
+        </div> <!--close dashboard-->
+
+
+	<div id='exploit' class='col-md-8'>
+                    <table class='table table-condensed' id='type-attacks-table'>
+                        <thead>
+                            <tr>
+				<th style='width:10%;'>Timestamp</th>
+                                <th>Exploit</th>
+				<th style='width:1%;'></th>
+				<th style='width:10%;'>IP</th>
+                            </tr>
+                        </thead>
+                        <tbody id='attack-cveresp'>
+                        <!--APPEND TABLE ROWS HERE-->
+                        </tbody>
+                    </table> <!--close live-attacks-table-->
+                </div> <!--close live-attack col-->
+            </div> <!--close row-->
+        </div> <!--close dashboard-->
+
+
+
+    </body>
+
+</html>
