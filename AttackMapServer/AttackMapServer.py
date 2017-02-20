@@ -234,11 +234,6 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
         self.write_message(json.dumps(msg_to_send))
 
 def main():
-    if getuid() != 0:
-        print('Please run this script as root')
-        print('SHUTTING DOWN')
-        exit()
-
     # Register handler pages
     handlers = [
                 (r'/websocket', WebSocketChatHandler),
