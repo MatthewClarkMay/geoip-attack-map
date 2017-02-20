@@ -99,7 +99,7 @@ Tested on Ubuntu 16.04 LTS.
   
     * To access via browser on another computer, use the external IP of the machine running the AttackMapServer.
     
-     * Edit the IP Address in the file "index.html" at "AttackMapServer" directory. From:
+     * Edit the IP Address in the file "/static/map.js" at "AttackMapServer" directory. From:
       
        ```javascript
        var webSock = new WebSocket("ws:/127.0.0.1:8888/websocket");
