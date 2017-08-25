@@ -8,8 +8,9 @@ var webSock = new WebSocket("ws:/127.0.0.1:8888/websocket"); // Internal
 //var webSock = new WebSocket("ws:/192.168.1.100:8888/websocket"); // External
 
 // link map
+
 L.mapbox.accessToken = "pk.eyJ1IjoibW1heTYwMSIsImEiOiJjaWgyYWU3NWQweWx2d3ltMDl4eGk5eWY1In0.9YoOkALPP7zaoim34ZITxw";
-var map = L.mapbox.map("map", "mmay601.p9if994e", {
+var map = L.mapbox.map("map", "mapbox.satellite", {
 center: [0, 0], // lat, long
 zoom: 2
 });
