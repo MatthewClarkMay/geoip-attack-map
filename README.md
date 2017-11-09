@@ -18,6 +18,7 @@ This program relies entirely on syslog, and because all appliances format logs d
 4. Add headquarters latitude/longitude to hqLatLng variable in **index.html**
 5. Use syslog-gen.py, or syslog-gen.sh to simulate dummy traffic "out of the box."
 6. **IMPORTANT: Remember, this code will only run correctly in a production environment after personalizing the parsing functions. The default parsing function is only written to parse ./syslog-gen.sh traffic.**
+7. Make sure to add the appropriate ssl certificate paths to `AttackMapServer.py`
 
 ### Bugs, Feedback, and Questions
 If you find any errors or bugs, please let me know. Questions and feedback are also welcome, and can be sent to mcmay.web@gmail.com, or open an issue in this repository.
@@ -86,7 +87,29 @@ Tested on Ubuntu 16.04 LTS.
     cd AttackMapServer/
     unzip static/flags.zip
     ``` 
- 
+
+* Generate ssl certificates for your server
+  
+  * Generate Self Signed Cert with Openssl:
+  ```sh
+  openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout domain.key -out domain.crt
+  ```
+
+    * **NOTE**: If you are using a self signed cert your browser will warn you that your connection is unsafe. 
+
+  * Alternatively you can use [https://letsencrypt.org/](https://letsencrypt.org/) to get a free signed certificate for your domain.
+
+* Configure the Attack Map Server with SSL Certs:
+
+  * Edit `ssl_options` in `AttackMapServer.py` to point to your certificates.
+  
+    ```python
+    ssl_options={
+        "certfile": "/path/to/domain.crt",
+        "keyfile": "/path/to/domain.key",
+    }
+    
+    ``` 
 * Start the Attack Map Server:
   
     ```sh
@@ -95,19 +118,21 @@ Tested on Ubuntu 16.04 LTS.
  
 * Access the Attack Map Server from browser:
 
-    * [http://localhost:8888/](http://localhost:8888/) or [http://127.0.0.1:8888/](http://127.0.0.1:8888/)
+    * [https://localhost:8888/](https://localhost:8888/) or [https://127.0.0.1:8888/](https://127.0.0.1:8888/)
+
+      * **NOTE** If you are using [https://localhost:8888/](https://localhost:8888/) and a self signed cert you will have to visit [https://127.0.0.1:8888/](https://127.0.0.1:8888/) and click proceed unsafely for the websocket connection to work.
   
     * To access via browser on another computer, use the external IP of the machine running the AttackMapServer.
     
      * Edit the IP Address in the file "/static/map.js" at "AttackMapServer" directory. From:
       
        ```javascript
-       var webSock = new WebSocket("ws:/127.0.0.1:8888/websocket");
+       var webSock = new WebSocket("wss:/127.0.0.1:8888/websocket");
        ```
      * To, for example: 
      
        ```javascript
-       var webSock = new WebSocket("ws:/192.168.1.100:8888/websocket");
+       var webSock = new WebSocket("wss:/192.168.1.100:8888/websocket");
        ```
      * Restart the Attack Map Server:
      
