@@ -8,7 +8,7 @@ AUTHOR: Matthew May - mcmay.web@gmail.com
 import json
 import redis
 import tornadoredis
-#import tornado.httpserver
+import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
@@ -235,12 +235,12 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
 
 def main():
     # Register handler pages
-    handlers = [
+    application = tornado.web.Application([
                 (r'/websocket', WebSocketChatHandler),
                 (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': 'static'}),
                 (r'/flags/(.*)', tornado.web.StaticFileHandler, {'path': 'static/flags'}),
                 (r'/', IndexHandler)
-                ]
+                ])
     
     # Define the static path
     #static_path = path.join( path.dirname(__file__), 'static' )
@@ -250,9 +250,14 @@ def main():
                 #'static_path': static_path
                 }
 
+    # Define path to ssl certs
+    ssl_options={
+        "certfile": "/path/to/domain.crt",
+        "keyfile": "/path/to/domain.key",
+    }
     # Create and start app listening on port 8888
     try:
-        app = tornado.web.Application(handlers, **settings)
+        app = tornado.httpserver.HTTPServer(application, ssl_options=ssl_options)
         app.listen(8888)
         print('[*] Waiting on browser connections...')
         tornado.ioloop.IOLoop.instance().start()
