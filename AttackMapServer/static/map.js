@@ -10,10 +10,9 @@ var webSock = new WebSocket("ws:/127.0.0.1:8888/websocket"); // Internal
 // link map
 
 L.mapbox.accessToken = "pk.eyJ1IjoibW1heTYwMSIsImEiOiJjaWgyYWU3NWQweWx2d3ltMDl4eGk5eWY1In0.9YoOkALPP7zaoim34ZITxw";
-var map = L.mapbox.map("map", "mapbox.dark", {
-center: [0, 0], // lat, long
-zoom: 2
-});
+var map = L.mapbox.map('map')
+.setView([0, 0], 2)
+.addLayer(L.mapbox.styleLayer('mapbox://styles/mapbox/dark-v10'));
 
 // add full screen option
 L.control.fullscreen().addTo(map);
