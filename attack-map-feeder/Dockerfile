@@ -5,6 +5,7 @@ WORKDIR /app
 RUN apt-get -y update
 RUN apt-get -y install unzip
 
+
 COPY attack-map-feeder/* ./attack-map-feeder/
 COPY requirements.txt ./
 
