@@ -251,10 +251,10 @@ def main():
                 #'static_path': static_path
                 }
 
-    # Create and start app listening on port 8888
+    # Create and start app listening on port 8080
     try:
         app = tornado.web.Application(handlers, **settings)
-        app.listen(8888)
+        app.listen(8080)
         print('[*] Waiting on browser connections...')
         tornado.ioloop.IOLoop.instance().start()
     except Exception as appFail:
