@@ -9,7 +9,7 @@ COPY attack-map-server/* ./attack-map-server/
 COPY requirements.txt ./
 
 RUN unzip ./attack-map-server/static/flags.zip
-RUN pip3 install -U -r requirements.txt
+RUN pip3 install -U -r requirements.txt setuptools==45
 RUN find .
 
 EXPOSE 8888
