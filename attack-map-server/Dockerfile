@@ -6,6 +6,8 @@ RUN apt-get -y update
 RUN apt-get -y install unzip
 
 COPY attack-map-server/* ./attack-map-server/
+COPY attack-map-server/static/* ./attack-map-server/static/
+
 COPY requirements.txt ./
 
 RUN unzip ./attack-map-server/static/flags.zip
