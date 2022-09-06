@@ -5,15 +5,15 @@ WORKDIR /app
 RUN apt-get -y update
 RUN apt-get -y install unzip
 
-COPY AttackMapServer/* ./AttackMapServer/
+COPY attack-map-server/* ./attack-map-server/
 COPY requirements.txt ./
 
-RUN unzip ./AttackMapServer/static/flags.zip
+RUN unzip ./attack-map-server/static/flags.zip
 RUN pip3 install -U -r requirements.txt
 RUN find .
 
 EXPOSE 8888
 
-WORKDIR /app/AttackMapServer
+WORKDIR /app/attack-map-server
 
 ENTRYPOINT ["./start.bash"]
