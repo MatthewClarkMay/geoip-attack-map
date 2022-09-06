@@ -13,7 +13,7 @@ RUN pip3 install -U -r requirements.txt
 RUN find .
 
 WORKDIR /app/DataServerDB
-RUN wget http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz
+COPY GeoLite2-City.mmdb.gz ./
 RUN gunzip GeoLite2-City.mmdb.gz
 RUN find .
 
