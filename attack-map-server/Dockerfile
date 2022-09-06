@@ -2,6 +2,9 @@ FROM python:3.9.13-buster
 
 WORKDIR /app
 
+RUN apt-get -y update
+RUN apt-get -y install unzip
+
 COPY AttackMapServer/* ./AttackMapServer/
 COPY requirements.txt ./
 
