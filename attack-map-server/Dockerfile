@@ -1,4 +1,4 @@
-FROM python:3.9.13-buster
+FROM python:2.7.18-buster
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ COPY attack-map-server/* ./attack-map-server/
 COPY requirements.txt ./
 
 RUN unzip ./attack-map-server/static/flags.zip
-RUN pip3 install -U -r requirements.txt setuptools==45
+RUN pip3 install -U -r requirements.txt
 RUN find .
 
 EXPOSE 8888
