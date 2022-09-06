@@ -14,6 +14,10 @@ RUN unzip ./attack-map-server/static/flags.zip
 RUN pip3 install -U -r requirements.txt
 RUN find .
 
+ENV GEOIP_REDIS_HOST localhost
+ENV GEOIP_LAT 37.3845
+ENV GEOIP_LONG -122.0881
+
 EXPOSE 8888
 
 WORKDIR /app/attack-map-server

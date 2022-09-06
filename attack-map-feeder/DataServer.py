@@ -11,6 +11,7 @@ import maxminddb
 #import re
 import redis
 import io
+import os
 
 from const import META, PORTMAP
 
@@ -25,7 +26,7 @@ from time import gmtime, localtime, sleep, strftime
 # default port is 6379
 # make sure system can use a lot of memory and overcommit memory
 
-redis_ip = '127.0.0.1'
+redis_ip = os.environ["GEOIP_REDIS_HOST"] #'127.0.0.1'
 redis_instance = None
 
 # required input paths
@@ -37,7 +38,7 @@ db_path = '../DataServerDB/GeoLite2-City.mmdb'
 #log_file_out = '/var/log/map_data_server.out'
 
 # ip for headquarters
-hq_ip = '8.8.8.8'
+hq_ip = os.environ["GEOIP_HQ_IP"] #'8.8.8.8'
 
 # stats
 server_start_time = strftime("%d-%m-%Y %H:%M:%S", localtime()) # local time

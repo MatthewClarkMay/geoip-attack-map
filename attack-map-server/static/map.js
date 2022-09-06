@@ -4,7 +4,7 @@
 // - AttackMapServer machine:
 //   - Internal IP: 127.0.0.1
 //   - External IP: 192.168.11.106
-var webSock = new WebSocket("ws:/127.0.0.1:8888/websocket"); // Internal
+var webSock = new WebSocket("ws:/" + window.location.hostname + "/websocket"); // Internal
 //var webSock = new WebSocket("ws:/192.168.1.100:8888/websocket"); // External
 
 // link map
@@ -19,7 +19,8 @@ zoom: 2
 L.control.fullscreen().addTo(map);
 
 // hq coords
-var hqLatLng = new L.LatLng(37.3845, -122.0881);
+//var hqLatLng = new L.LatLng(37.3845, -122.0881);
+var hqLatLng = new L.LatLng(__GEOIP_LAT__, __GEOIP_LONG__);
 
 // hq marker
 L.circle(hqLatLng, 110000, {

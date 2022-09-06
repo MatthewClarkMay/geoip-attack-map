@@ -12,6 +12,7 @@ import tornadoredis
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
+import os
 #import re
 
 from os import getuid, path
@@ -60,7 +61,7 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
 
         try:
             # This is the IP address of the DataServer
-            self.client = tornadoredis.Client('127.0.0.1')
+            self.client = tornadoredis.Client(os.environ["GEOIP_REDIS_HOST"])
             self.client.connect()
             print('[*] Connected to Redis server')
             yield tornado.gen.Task(self.client.subscribe, 'attack-map-production')
