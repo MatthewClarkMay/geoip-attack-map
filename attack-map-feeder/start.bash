@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3 DataServer.py
+python3 -u DataServer.py
