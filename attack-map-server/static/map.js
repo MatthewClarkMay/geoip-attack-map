@@ -9,7 +9,7 @@ var webSock = new WebSocket("wss:/" + window.location.hostname + "/websocket"); 
 
 // link map
 
-L.mapbox.accessToken = "pk.eyJ1IjoibW1heTYwMSIsImEiOiJjaWgyYWU3NWQweWx2d3ltMDl4eGk5eWY1In0.9YoOkALPP7zaoim34ZITxw";
+L.mapbox.accessToken = "pk.eyJ1IjoicGphbWVuYWphIiwiYSI6ImNsN3F3cnZsdzA0amgzcHFta2Zjbng3bDQifQ.qfv4HKit1Ly46aqckbsHHA";
 var map = L.mapbox.map("map", "mapbox.dark", {
 center: [0, 0], // lat, long
 zoom: 2
