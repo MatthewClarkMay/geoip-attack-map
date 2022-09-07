@@ -105,15 +105,7 @@
     }
 
     .col-md-4 {
-        height:200;
+        height:154px;
+        overflow-y:scroll;
+        overflow-x:auto;
     }
-  
-
-
-
-
-
-
-
-
-
