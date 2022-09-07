@@ -19,8 +19,8 @@ zoom: 2
 L.control.fullscreen().addTo(map);
 
 // hq coords
-//var hqLatLng = new L.LatLng(37.3845, -122.0881);
-var hqLatLng = new L.LatLng(__GEOIP_LAT__, __GEOIP_LONG__);
+var hqLatLng = new L.LatLng(37.3845, -122.0881);
+//var hqLatLng = new L.LatLng(__GEOIP_LAT__, __GEOIP_LONG__);
 
 // hq marker
 L.circle(hqLatLng, 110000, {
