@@ -286,6 +286,10 @@ def main():
     # Find HQ lat/long
     hq_dict = find_hq_lat_long(hq_ip)
 
+    while not os.path.exists(syslog_path):
+        print('Waiting for file : {} to be available'.format(syslog_path))
+        time.sleep(10)
+
     # Follow/parse/format/publish syslog data
     with io.open(syslog_path, "r", encoding='ISO-8859-1') as syslog_file:
         syslog_file.readlines()
