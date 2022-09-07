@@ -11,6 +11,7 @@ COPY attack-map-server/static/* ./attack-map-server/static/
 COPY requirements.txt ./
 
 RUN unzip ./attack-map-server/static/flags.zip
+RUN mv flags ./attack-map-server/static
 RUN pip3 install -U -r requirements.txt
 RUN find .
 
