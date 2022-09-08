@@ -11,8 +11,8 @@ do
         dst_ip="8.8.8.8"
         #port=${possible_ports[$RANDOM % ${#possible_ports[@]}]}
         src_port=$port
-        dst_port=$port
-        logger -t attack-map-sample "$src_ip,$dst_ip,$src_port,$dst_port,ATTACK!!!$port,JOOMLA$port"
+        dst_port=$port        
+        logger -P 6514 -T -n localhost -t attack-map-sample "$src_ip,$dst_ip,$src_port,$dst_port,ATTACK!!!$port,JOOMLA$port"
         sleep .2 
     done
 done
