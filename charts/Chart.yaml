@@ -1,0 +1,28 @@
+apiVersion: v2
+name: geoip-attack-map
+description: A Helm chart for GeoIP Attack Map
+
+type: application
+
+version: 1.0.1
+
+appVersion: "1.0"
+
+dependencies:
+  - name: "generic-app"
+    alias: attack-map-server
+    condition: attack-map-server.enabled
+    repository: "https://charts.visonneau.fr/"
+    version: "0.0.14"
+
+  - name: "generic-app"
+    alias: attack-map-feeder
+    condition: attack-map-feeder.enabled
+    repository: "https://charts.visonneau.fr/"
+    version: "0.0.14"
+
+  - name: "redis"
+    alias: redis
+    condition: redis.enabled
+    repository: "https://charts.bitnami.com/bitnami"
+    version: "17.1.4"

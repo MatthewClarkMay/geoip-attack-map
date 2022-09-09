@@ -1,0 +1,92 @@
+name: GeoIP Attack Map
+
+on:
+  push:
+    branches: [ develop, main ]
+    tags: ['v*.*.*']
+
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [ attack-map-server, attack-map-feeder ]
+    outputs:
+      imageTag: ${{ steps.prep.outputs.version }}
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Prepare
+      id: prep
+      run: |
+        DOCKER_IMAGE=itssoftware/${{matrix.service}}
+        GCR_IMAGE=gcr.io/its-artifact-commons/${{matrix.service}}
+        VERSION=latest
+        GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")
+
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/}
+        elif [[ $GITHUB_REF == refs/heads/* ]]; then
+          BRANCH=$(echo ${GITHUB_REF#refs/heads/} | sed -r 's#/+#-#g')
+          VERSION=$BRANCH-$GIT_HASH
+        fi
+
+        TAGS="${DOCKER_IMAGE}:${VERSION}"
+        GCR_TAGS="${GCR_IMAGE}:${VERSION}"
+
+        if [[ $VERSION =~ ^v[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+          MINOR=${VERSION%.*}
+          MAJOR=${MINOR%.*}
+          TAGS="$TAGS,${DOCKER_IMAGE}:${MINOR},${DOCKER_IMAGE}:${MAJOR},${DOCKER_IMAGE}:latest"
+        elif [ "${{ github.event_name }}" = "push" ]; then
+          TAGS="$TAGS,${DOCKER_IMAGE}:sha-${GITHUB_SHA::8}"
+        fi
+
+        echo ::set-output name=tags::${TAGS}
+        echo ::set-output name=gcr_tags::${GCR_TAGS}
+        echo ::set-output name=version::${VERSION}
+
+    - name: Line notification start
+      uses: snow-actions/line-notify@v1.0.0
+      with:
+        access_token: ${{ secrets.LINE_ACCESS_TOKEN }}
+        message: "Start building [${{matrix.service}}] [${{ steps.prep.outputs.version }}]..."
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Activate GCP service account
+      uses: google-github-actions/setup-gcloud@v0.2.1
+      with:
+        service_account_email: ${{ secrets.GCR_EMAIL }}
+        service_account_key: ${{ secrets.GCR_KEY }}
+
+    - name: GCR Authen
+      run: |
+        # Set up docker to authenticate
+        # via gcloud command-line tool.
+        gcloud auth configure-docker
+
+    - name: Build and push images
+      uses: docker/build-push-action@v2
+      with:
+        file: ${{matrix.service}}/Dockerfile
+        push: true
+        load: false
+        tags: ${{ steps.prep.outputs.gcr_tags }}
+        build-args: version=${{ steps.prep.outputs.version }}
+
+    - name: show job status
+      if: always()
+      uses: snow-actions/line-notify@v1.0.0
+      with:
+        access_token: ${{ secrets.LINE_ACCESS_TOKEN }}
+        message: "Done building [${{matrix.service}}] [${{ steps.prep.outputs.version }}] with status [${{job.status}}]"
