@@ -1,0 +1,12 @@
+dependencies:
+- name: generic-app
+  repository: https://charts.visonneau.fr/
+  version: 0.0.14
+- name: generic-app
+  repository: https://charts.visonneau.fr/
+  version: 0.0.14
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 17.1.4
+digest: sha256:18f20ceed2656d93c51d508c1ec1244a7a2c4012165617a1377dfad0090af349
+generated: "2022-09-09T15:49:49.1774972+07:00"

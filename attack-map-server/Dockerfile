@@ -15,7 +15,7 @@ RUN mv flags ./attack-map-server/static
 RUN pip3 install -U -r requirements.txt
 RUN find .
 
-ENV GEOIP_REDIS_HOST localhost
+ENV GEOIP_REDIS_HOST redis-master
 ENV GEOIP_LAT 13.7457
 ENV GEOIP_LONG 100.5025
 ENV GEOIP_MAPBOX_TOKEN=please-change-here

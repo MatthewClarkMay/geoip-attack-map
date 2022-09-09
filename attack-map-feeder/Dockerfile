@@ -17,7 +17,7 @@ COPY GeoLite2-City.mmdb.gz ./
 RUN gunzip GeoLite2-City.mmdb.gz
 RUN find .
 
-ENV GEOIP_REDIS_HOST localhost
+ENV GEOIP_REDIS_HOST redis-master
 ENV GEOIP_HQ_IP 8.8.8.8
 
 WORKDIR /app/attack-map-feeder

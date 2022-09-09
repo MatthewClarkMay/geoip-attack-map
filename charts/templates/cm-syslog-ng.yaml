@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: syslog-ng-cm
+  annotations:
+    checksum/config1: {{ .Files.Get "configs/syslog-ng.conf" | sha256sum }}
+data:
+  syslog-ng.conf: |-
+{{ .Files.Get "configs/syslog-ng.conf" |  indent 4 }}

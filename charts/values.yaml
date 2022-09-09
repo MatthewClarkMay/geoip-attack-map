@@ -1,0 +1,73 @@
+attack-map-server:
+  enabled: true
+  nameOverride: attack-map-server
+
+  pods:
+    controller: deployment
+    image:
+      name: gcr.io/its-artifact-commons/attack-map-server
+    env: []
+    #  - name: GEOIP_REDIS_HOST
+    #    value: redis-master
+    #  - name: GEOIP_MAPBOX_TOKEN
+    #    value: "change-this"
+    #  - name: GEOIP_IMAGE_PATH
+    #    value: "https://yourdomain.com/your-picture.png"
+
+  ingress:
+    enabled: false
+    service:
+      port:
+        name: http
+
+attack-map-feeder:
+  enabled: true
+  nameOverride: attack-map-feeder
+
+  service:
+    enabled: true
+    ports:
+      - port: 6514
+        targetPort: 6514
+        protocol: TCP
+        name: syslog
+
+  pods:
+    controller: deployment
+    image:
+      name: gcr.io/its-artifact-commons/attack-map-feeder
+    env: []
+    #  - name: GEOIP_REDIS_HOST
+    #    value: redis-master
+
+    additionalContainers:
+      - name: syslog-ng
+        image: balabit/syslog-ng:3.38.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 6514
+          protocol: TCP
+        volumeMounts:
+        - name: var-logs
+          mountPath: /var/log/
+        - name: config
+          mountPath: /etc/syslog-ng/
+          readOnly: true
+    volumeMounts:
+      - name: var-logs
+        mountPath: /var/log/
+    volumes:
+      - name: var-logs
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: syslog-ng-cm
+
+redis:
+  fullnameOverride: redis
+  architecture: standalone
+  auth:
+    enabled: false
+  #master:
+  #  persistence:
+  #    storageClass: longhorn
