@@ -143,6 +143,10 @@ def find_dst_lat_long(dst_ip):
     dst_ip_db_unclean = parse_maxminddb(db_path, dst_ip)
     if dst_ip_db_unclean:
         dst_ip_db_clean = clean_db(dst_ip_db_unclean)
+
+        if not dst_ip_db_clean:
+            return None
+
         dst_lat = dst_ip_db_clean['latitude']
         dst_long = dst_ip_db_clean['longitude']
         dst_dict = {
