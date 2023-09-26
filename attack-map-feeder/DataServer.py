@@ -152,7 +152,7 @@ def find_dst_lat_long(dst_ip):
         return dst_dict
     else:
         print('Please provide a valid IP address for the destination')
-        exit()
+        return None
 
 def parse_maxminddb(db_path, ip):
     try:
@@ -322,7 +322,7 @@ def main():
 
                     dst_dict = find_dst_lat_long(syslog_data_dict['dst_ip'])
                     if not dst_dict:
-                            dst_dict = hq_dict
+                        dst_dict = hq_dict
 
                     if ip_db_unclean:
                         event_count += 1
