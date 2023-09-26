@@ -18,7 +18,6 @@ var map = L.mapbox.map("map", "mapbox.dark", {
 L.control.fullscreen().addTo(map);
 
 // hq coords
-//var hqLatLng = new L.LatLng(13.7457, 100.5025);
 var hqLatLng = new L.LatLng(__GEOIP_LAT__, __GEOIP_LONG__);
 
 // hq marker
@@ -139,15 +138,15 @@ function handleParticle(msg, srcPoint) {
     //d3.event.preventDefault();
 }
 
-function handleTraffic(msg, srcPoint, hqPoint) {
+function handleTraffic(msg, srcPoint, dstPoint) {
     var fromX = srcPoint['x'];
     var fromY = srcPoint['y'];
-    var toX = hqPoint['x'];
-    var toY = hqPoint['y'];
+    var toX = dstPoint['x'];
+    var toY = dstPoint['y'];
     var bendArray = [true, false];
     var bend = bendArray[Math.floor(Math.random() * bendArray.length)];
 
-    var lineData = [srcPoint, calcMidpoint(fromX, fromY, toX, toY, bend), hqPoint]
+    var lineData = [srcPoint, calcMidpoint(fromX, fromY, toX, toY, bend), dstPoint]
     var lineFunction = d3.svg.line()
         .interpolate("basis")
         .x(function (d) { return d.x; })
@@ -454,16 +453,18 @@ webSock.onmessage = function (e) {
     try {
         var msg = JSON.parse(e.data);
         console.log(msg);
+        console.log("DEBUG1");
         switch (msg.type) {
             case "Traffic":
                 console.log("Traffic!");
                 var srcLatLng = new L.LatLng(msg.src_lat, msg.src_long);
-                var hqPoint = map.latLngToLayerPoint(hqLatLng);
+                var dstLatLng = new L.LatLng(msg.dst_lat, msg.dst_long);
+                var dstPoint = map.latLngToLayerPoint(dstLatLng); //map.latLngToLayerPoint(hqLatLng);
                 var srcPoint = map.latLngToLayerPoint(srcLatLng);
                 console.log('');
                 addCircle(msg, srcLatLng);
                 handleParticle(msg, srcPoint);
-                handleTraffic(msg, srcPoint, hqPoint, srcLatLng);
+                handleTraffic(msg, srcPoint, dstPoint);
                 handleLegend(msg);
                 handleLegendType(msg)
                 break;
